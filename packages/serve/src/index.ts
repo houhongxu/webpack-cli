@@ -6,8 +6,11 @@ const WEBPACK_DEV_SERVER_PACKAGE = process.env.WEBPACK_DEV_SERVER_PACKAGE || "we
 
 type Problem = NonNullable<ReturnType<(typeof cli)["processArguments"]>>[0];
 
+//// serve命令类
 class ServeCommand {
+  //// serve命令apply执行函数
   async apply(cli: IWebpackCLI): Promise<void> {
+    //// 加载webpack-dev-server并获取配置
     const loadDevServerOptions = () => {
       const devServer = require(WEBPACK_DEV_SERVER_PACKAGE);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,11 +34,14 @@ class ServeCommand {
         dependencies: [WEBPACK_PACKAGE, WEBPACK_DEV_SERVER_PACKAGE],
       },
       async () => {
+        //// 处理配置项
         let devServerFlags = [];
 
+        //// 先加载webpack
         cli.webpack = await cli.loadWebpack();
 
         try {
+          //// 尝试加载dev server配置
           devServerFlags = loadDevServerOptions();
         } catch (error) {
           cli.logger.error(
@@ -54,6 +60,7 @@ class ServeCommand {
         let devServerFlags = [];
 
         try {
+          //// 加载dev server配置
           devServerFlags = loadDevServerOptions();
         } catch (_err) {
           // Nothing, to prevent future updates
@@ -106,6 +113,7 @@ class ServeCommand {
 
         webpackCLIOptions.isWatchingLikeCommand = true;
 
+        //// 创建webpack compiler
         const compiler = await cli.createCompiler(webpackCLIOptions);
 
         if (!compiler) {
@@ -127,6 +135,7 @@ class ServeCommand {
           process.stdin.resume();
         }
 
+        //// 加载dev server
         const DevServer = require(WEBPACK_DEV_SERVER_PACKAGE);
 
         try {
@@ -212,6 +221,7 @@ class ServeCommand {
             process.exit(2);
           }
 
+          //// dev server配置项
           const devServerOptions: WebpackDevServerOptions = result as WebpackDevServerOptions;
 
           if (devServerOptions.port) {
@@ -227,10 +237,13 @@ class ServeCommand {
           }
 
           try {
+            //// 获取dev server实例
             const server = new DevServer(devServerOptions, compiler);
 
+            //// 启动dev server
             await server.start();
 
+            //// 记录server到数组里
             servers.push(server);
           } catch (error) {
             if (cli.isValidationError(error as Error)) {

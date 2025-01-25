@@ -14,4 +14,5 @@ if (!process.env.WEBPACK_CLI_SKIP_IMPORT_LOCAL) {
 
 process.title = "webpack";
 
+//// 调用bootsrap引导
 runCLI(process.argv);
